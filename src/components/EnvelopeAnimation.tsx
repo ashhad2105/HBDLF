@@ -71,23 +71,7 @@ const EnvelopeAnimation: React.FC<EnvelopeAnimationProps> = ({ onComplete }) => 
           </div>
         )}
 
-        {showMessage && (
-          <div className="mt-8 animate-fade-in">
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-lg border border-pink-200">
-              <h1 className="text-4xl font-dancing text-pink-600 mb-4 animate-bounce">
-                Happy Birthday My Love! 🎉
-              </h1>
-              <p className="text-lg font-poppins text-gray-700 leading-relaxed">
-                This website is made with all my love, just for you. 
-                Get ready for a magical journey through our memories, 
-                dreams, and all the reasons why you mean everything to me.
-              </p>
-              <div className="mt-6">
-                <Heart className="w-8 h-8 text-red-400 mx-auto animate-pulse" />
-              </div>
-            </div>
-          </div>
-        )}
+        
       </div>
     </div>
   );
