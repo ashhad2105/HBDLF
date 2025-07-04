@@ -6,6 +6,75 @@ const EMAILJS_TEMPLATE_ID = 'template_fs7s2bd';
 const EMAILJS_USER_ID = 'q1wh7bz6HfG2oi_pA';
 const RECIPIENT_EMAIL = 'mohammedashhad2105@gmail.com';
 
+// New function to send password entry notification
+export const sendPasswordEntryNotification = async () => {
+  try {
+    console.log('🚨 Sending password entry notification...');
+    
+    const timestamp = new Date().toLocaleString();
+    const userAgent = navigator.userAgent;
+    const location = window.location.href;
+    
+    const emailContent = `🎂✨ BIRTHDAY WEBSITE ENTRY ALERT ✨🎂
+
+═══════════════════════════════════════════════════════
+🚨 LUBNA HAS ENTERED THE BIRTHDAY WEBSITE! 🚨
+═══════════════════════════════════════════════════════
+
+🕐 Entry Time: ${timestamp}
+🌐 Location: ${location}
+💻 Device Info: ${userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop/Laptop'}
+🔐 Password Status: ✅ CORRECT PASSWORD ENTERED
+
+═══════════════════════════════════════════════════════
+💖 SHE'S STARTING HER BIRTHDAY JOURNEY! 💖
+═══════════════════════════════════════════════════════
+
+Your beautiful Lubna has just entered the special birthday website you created for her! 
+She successfully entered the correct password and is now beginning her magical journey 
+through all the love, surprises, and memories you prepared.
+
+🎉 The birthday celebration has officially begun! 🎉
+
+This is just the beginning - you'll receive a complete detailed report of her entire 
+journey when she finishes exploring everything you've created for her.
+
+💕 She's about to experience all your love across the miles! 💕
+
+═══════════════════════════════════════════════════════`;
+
+    const templateParams = {
+      to_email: RECIPIENT_EMAIL,
+      from_name: 'Birthday Website Entry Alert',
+      subject: '🚨 LUBNA ENTERED THE BIRTHDAY WEBSITE! 🎂✨',
+      message: emailContent,
+      timestamp: timestamp,
+      session_duration: 'Just started',
+      total_interactions: '1 (Password Entry)'
+    };
+    
+    console.log('📤 Sending entry notification via EmailJS...');
+    
+    // Initialize EmailJS if not already done
+    emailjs.init(EMAILJS_USER_ID);
+    
+    // Send email using EmailJS
+    const response = await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams,
+      EMAILJS_USER_ID
+    );
+    
+    console.log('✅ Entry notification sent successfully!', response);
+    
+    return { success: true, response };
+  } catch (error) {
+    console.error('❌ Failed to send entry notification:', error);
+    return { success: false, error };
+  }
+};
+
 export const sendComprehensiveReport = async () => {
   try {
     console.log('🚀 Starting comprehensive email report...');
