@@ -1,240 +1,257 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, ArrowRight, Play } from 'lucide-react';
-import { sendComprehensiveReport } from '../utils/emailService';
+import React, { useState } from 'react';
+import { Heart, ArrowRight } from 'lucide-react';
 import { tracker } from '../utils/interactionTracker';
 
-const FakeEnding: React.FC = () => {
-  const [showFakeEnd, setShowFakeEnd] = useState(true);
-  const [showRealSurprise, setShowRealSurprise] = useState(false);
-  const [showVideoMessage, setShowVideoMessage] = useState(false);
-  const [showFinalCelebration, setShowFinalCelebration] = useState(false);
-  const [showContinueButton, setShowContinueButton] = useState(false);
-  const [showFinalLetter, setShowFinalLetter] = useState(false);
-  const [showLetterButton, setShowLetterButton] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+interface VirtualCakeProps {
+  onComplete: () => void;
+}
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowFakeEnd(false);
+const VirtualCake: React.FC<VirtualCakeProps> = ({ onComplete }) => {
+  const [candlesBlown, setCandlesBlown] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const [cakeSliced, setCakeSliced] = useState(false);
+  const [showSliceButton, setShowSliceButton] = useState(false);
+
+  const blowCandles = () => {
+    setCandlesBlown(true);
+    setShowConfetti(true);
+    tracker.trackCandlesBlow();
+    
+    setTimeout(() => {
+      setShowMessage(true);
       setTimeout(() => {
-        setShowRealSurprise(true);
-        setTimeout(() => {
-          setShowContinueButton(true);
-        }, 3000);
+        setShowSliceButton(true);
       }, 2000);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleContinueToVideo = () => {
-    setShowRealSurprise(false);
-    setShowContinueButton(false);
-    tracker.trackClick('continue_to_video');
-    setTimeout(() => {
-      setShowVideoMessage(true);
-    }, 1000);
+    }, 1500);
   };
 
-  const handleVideoComplete = () => {
-    setShowVideoMessage(false);
-    tracker.trackClick('video_complete');
-    setTimeout(() => {
-      setShowFinalLetter(true);
+  const sliceCake = () => {
+    setCakeSliced(true);
+    tracker.trackInteraction('cake_sliced');
+    
+    // Create slice animation effect
+    for (let i = 0; i < 8; i++) {
       setTimeout(() => {
-        setShowLetterButton(true);
-      }, 5000);
-    }, 1000);
-  };
-
-  const handleLetterComplete = async () => {
-    setShowFinalLetter(false);
-    setShowLetterButton(false);
-    tracker.trackClick('letter_complete');
-    
-    // Automatically send comprehensive report silently
-    if (!emailSent) {
-      setEmailSent(true);
-      await sendComprehensiveReport();
+        const slice = document.createElement('div');
+        slice.innerHTML = '🍰';
+        slice.className = 'fixed text-3xl pointer-events-none z-50 animate-float-up';
+        slice.style.left = Math.random() * window.innerWidth + 'px';
+        slice.style.top = window.innerHeight + 'px';
+        document.body.appendChild(slice);
+        setTimeout(() => slice.remove(), 3000);
+      }, i * 200);
     }
-    
-    setTimeout(() => {
-      setShowFinalCelebration(true);
-    }, 1000);
   };
 
-  if (showFakeEnd) {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-        <div className="text-center max-w-2xl">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-gray-200">
-            <h1 className="text-4xl font-dancing text-gray-600 mb-6">
-              That's All!
-            </h1>
-            <p className="text-lg font-poppins text-gray-500 mb-8">
-              Thank you for going through this birthday journey with me. I hope you enjoyed all the surprises I prepared for you from across the miles.
-            </p>
-            <div className="text-gray-400">🎉 Happy Birthday, My Love 🎉</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleContinue = () => {
+    tracker.trackClick('continue_cake');
+    onComplete();
+  };
 
-  if (showRealSurprise && !showVideoMessage) {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-pink-200 via-purple-100 to-cream-200 flex items-center justify-center">
-        <div className="text-center max-w-2xl animate-fade-in">
-          <div className="mb-8">
-            <div className="text-8xl animate-bounce mb-6">😏</div>
-            <h1 className="text-5xl font-dancing text-pink-600 mb-6 animate-pulse">
-              Wait... One More Thing! 💌
-            </h1>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-pink-200 mb-8">
-            <p className="text-xl font-poppins text-gray-700 leading-relaxed mb-6">
-              Did you really think I would end our special day without one final surprise? You know me better than that! I have something very special to show you... 😘
-            </p>
-            <p className="text-lg font-poppins text-pink-600">
-              The most important part of your birthday surprise is waiting for you!
-            </p>
-          </div>
-
-          {showContinueButton && (
-            <button
-              onClick={handleContinueToVideo}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-8 rounded-full font-poppins font-medium text-lg hover:from-pink-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-xl animate-pulse"
-            >
-              Continue to Final Surprise
-              <ArrowRight className="w-5 h-5 inline ml-2" />
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (showVideoMessage && !showFinalLetter) {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-purple-100 via-pink-50 to-cream-100">
-        <div className="max-w-4xl mx-auto py-8">
-          <div className="text-center mb-8">
-            <Heart className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-dancing text-pink-600 mb-4">
-              A Special Message From My Heart
-            </h1>
-            <p className="text-lg font-poppins text-gray-600">
-              The most important part of your birthday surprise
-            </p>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-pink-200 max-w-3xl mx-auto">
-            <div className="p-8">
-              <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6 relative border-4 border-gray-300">
-                <div className="w-full h-full">
-                  <iframe 
-  width="100%" 
-  height="100%" 
-  src="https://drive.google.com/file/d/1EBLuW1lpxPE8j3GeZbF9DuJbkaPs0VyD/preview" 
-  title="Google Drive video player" 
-  frameborder="0" 
-  allow="autoplay; encrypted-media; picture-in-picture" 
-  allowfullscreen 
-  class="rounded-2xl">
-</iframe>
-                </div>
-              </div>
-
-              <div className="bg-pink-50 p-6 rounded-2xl mb-6">
-                <h4 className="text-xl font-dancing text-pink-600 mb-3">
-                  Until you can see my video, here's what I want you to know:
-                </h4>
-                <p className="font-poppins text-gray-700 leading-relaxed">
-                  "My beautiful love, even though we're miles apart, you are always in my heart. Every day I wake up grateful for you, for us, for this incredible love we share. The distance has only made me love you more deeply, appreciate you more fully, and dream about our future more vividly. Happy birthday, my angel. I can't wait to celebrate every birthday with you for the rest of our lives."
-                </p>
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={handleVideoComplete}
-                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-8 rounded-full font-poppins font-medium text-lg hover:from-pink-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-xl"
-                >
-                  Continue the Journey
-                  <ArrowRight className="w-5 h-5 inline ml-2" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (showFinalLetter && !showFinalCelebration) {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-pink-100 via-purple-50 to-cream-100 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(30)].map((_, i) => (
-            <Heart
+  return (
+    <div className="min-h-screen p-4 bg-gradient-to-br from-yellow-100 via-pink-50 to-purple-100 relative overflow-hidden">
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {[...Array(50)].map((_, i) => (
+            <div
               key={i}
-              className="absolute text-pink-400 animate-float opacity-70"
+              className="absolute animate-confetti text-2xl"
               style={{
                 left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-                fontSize: `${1 + Math.random() * 2}rem`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
               }}
-            />
+            >
+              {['🎉', '🎊', '💖', '✨', '🌟', '🎂', '🍰', '🌹', '💕'][Math.floor(Math.random() * 9)]}
+            </div>
           ))}
         </div>
+      )}
 
-        <div className="max-w-4xl mx-auto py-8 relative z-10">
-          <div className="text-center animate-fade-in">
-            <div className="mb-8">
-              <div className="text-8xl mb-6 animate-pulse">💖</div>
-              <h1 className="text-6xl md:text-7xl font-dancing text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-6">
-                I Love You Sooo Much
-              </h1>
-              <h2 className="text-3xl md:text-4xl font-pacifico text-pink-500 mb-8">
-                Across Every Mile, Beyond Every Distance
-              </h2>
-            </div>
+      <div className="max-w-4xl mx-auto py-8">
+        <div className="text-center mb-8">
+          <Heart className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h1 className="text-4xl md:text-5xl font-dancing text-pink-600 mb-4">
+            Make a Wish! 🎂
+          </h1>
+          <p className="text-lg font-poppins text-gray-600">
+            Your special birthday cake awaits, my beautiful princess
+          </p>
+        </div>
 
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-pink-200 mb-8">
-              <div className="text-6xl mb-8">🌹</div>
-              <div className="space-y-6 text-left max-w-2xl mx-auto">
-                <p className="text-xl font-dancing text-gray-700 leading-relaxed">
-                  My Dearest Beautiful Soul,
-                </p>
-                <p className="text-lg font-poppins text-gray-700 leading-relaxed">
-                  If you've made it this far, it means you've experienced every single surprise I prepared for you from across the miles. But the real surprise isn't in any of these pages - it's in my heart, where my love for you grows stronger with every video call, every text message, every "good morning" and "good night."
-                </p>
-                <p className="text-lg font-poppins text-gray-700 leading-relaxed">
-                  This website is just a tiny glimpse into how much you mean to me. Every memory we've created through screens, every dream we've shared for our future, every moment of missing you - they all pale in comparison to the joy you bring to my life simply by being you, even from thousands of miles away.
-                </p>
-                <p className="text-lg font-poppins text-gray-700 leading-relaxed">
-                  On your special day, I want you to know that you are cherished, celebrated, and loved beyond measure. You are my sunshine across time zones, my inspiration through every challenge, and my forever home that I'm coming to soon.
-                </p>
-                <p className="text-xl font-dancing text-pink-600 leading-relaxed">
-                  Happy Birthday, My Everything. Here's to your last birthday where we have to celebrate apart. Next year, I'll be right there beside you, and every year after that. 💖
-                </p>
-                <p className="text-lg font-dancing text-gray-700 text-right">
-                  Forever yours across every mile,
-                  <br />
-                  Your devoted heart ❤️
-                </p>
+        <div className="text-center">
+          <div className="relative inline-block">
+            {/* Beautiful Romantic Cake */}
+            <div className="relative">
+              {/* Main Cake Structure - 3 Tiers */}
+              <div className="relative w-96 h-64 mx-auto">
+                
+                {/* Bottom Tier - Largest */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-80 h-24">
+                  <div className="w-full h-full bg-gradient-to-b from-pink-50 to-pink-100 rounded-t-3xl shadow-2xl border-4 border-pink-200 relative overflow-hidden">
+                    {/* Cake texture */}
+                    <div className="absolute inset-2 bg-gradient-to-b from-cream-50 to-cream-100 rounded-t-2xl"></div>
+                    {/* Decorative roses around bottom tier */}
+                    <div className="absolute -top-2 left-4 text-2xl">🌹</div>
+                    <div className="absolute -top-2 right-4 text-2xl">🌹</div>
+                    <div className="absolute top-4 left-2 text-xl">🌸</div>
+                    <div className="absolute top-4 right-2 text-xl">🌸</div>
+                    <div className="absolute top-8 left-6 text-lg">💕</div>
+                    <div className="absolute top-8 right-6 text-lg">💕</div>
+                  </div>
+                  {/* Pink frosting border */}
+                  <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-pink-300 via-rose-300 to-pink-300 rounded-t-3xl border-2 border-pink-400"></div>
+                </div>
+
+                {/* Middle Tier */}
+                <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-64 h-20">
+                  <div className="w-full h-full bg-gradient-to-b from-purple-50 to-purple-100 rounded-t-2xl shadow-xl border-3 border-purple-200 relative overflow-hidden">
+                    {/* Cake texture */}
+                    <div className="absolute inset-2 bg-gradient-to-b from-cream-50 to-cream-100 rounded-t-xl"></div>
+                    {/* Heart decorations */}
+                    <div className="absolute top-2 left-4 text-lg">💖</div>
+                    <div className="absolute top-2 right-4 text-lg">💖</div>
+                    <div className="absolute top-6 left-8 text-sm">✨</div>
+                    <div className="absolute top-6 right-8 text-sm">✨</div>
+                  </div>
+                  {/* Purple frosting border */}
+                  <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 rounded-t-2xl border-2 border-purple-400"></div>
+                </div>
+
+                {/* Top Tier */}
+                <div className="absolute bottom-36 left-1/2 transform -translate-x-1/2 w-48 h-16">
+                  <div className="w-full h-full bg-gradient-to-b from-cream-50 to-cream-100 rounded-t-xl shadow-lg border-2 border-cream-200 relative overflow-hidden">
+                    {/* Cake texture */}
+                    <div className="absolute inset-1 bg-gradient-to-b from-white to-cream-50 rounded-t-lg"></div>
+                    {/* Small decorations */}
+                    <div className="absolute top-1 left-3 text-sm">🌟</div>
+                    <div className="absolute top-1 right-3 text-sm">🌟</div>
+                    <div className="absolute top-4 left-6 text-xs">💫</div>
+                    <div className="absolute top-4 right-6 text-xs">💫</div>
+                  </div>
+                  {/* White frosting border */}
+                  <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-white via-pink-100 to-white rounded-t-xl border border-pink-200"></div>
+                </div>
+
+                {/* Beautiful Name on Cake */}
+                <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 w-64 h-8 flex items-center justify-center">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-2 shadow-lg border-2 border-pink-300">
+                    <span className="text-2xl font-dancing text-pink-600 font-bold tracking-wide">
+                      Happy Birthday Lubna
+                    </span>
+                  </div>
+                </div>
+
+                {/* Elegant Candles */}
+                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 flex space-x-6">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      {/* Candle holder */}
+                      <div className="w-1 h-2 bg-gradient-to-b from-gold-300 to-gold-400 rounded-full mb-1"></div>
+                      {/* Candle stick */}
+                      <div className="w-3 h-16 bg-gradient-to-b from-pink-300 to-pink-400 rounded-t-full shadow-lg border border-pink-500 relative">
+                        {/* Candle details */}
+                        <div className="absolute top-2 left-0 right-0 h-0.5 bg-pink-500 opacity-50"></div>
+                        <div className="absolute top-6 left-0 right-0 h-0.5 bg-pink-500 opacity-50"></div>
+                        
+                        {/* Flame */}
+                        {!candlesBlown && (
+                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div className="w-4 h-5 bg-gradient-to-t from-orange-400 via-yellow-300 to-yellow-200 rounded-full animate-flicker shadow-lg">
+                              <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-2 h-3 bg-gradient-to-t from-red-400 to-orange-300 rounded-full opacity-80"></div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Smoke after blowing */}
+                        {candlesBlown && (
+                          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <div className="text-gray-400 text-lg animate-fade-in opacity-70">💨</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Romantic decorative elements */}
+                <div className="absolute -left-8 top-8 text-3xl animate-float opacity-70">🌹</div>
+                <div className="absolute -right-8 top-12 text-3xl animate-float opacity-70" style={{animationDelay: '1s'}}>🌹</div>
+                <div className="absolute -left-6 bottom-8 text-2xl animate-float opacity-60" style={{animationDelay: '2s'}}>💕</div>
+                <div className="absolute -right-6 bottom-12 text-2xl animate-float opacity-60" style={{animationDelay: '3s'}}>💕</div>
+
+                {/* Cake slice lines when cut */}
+                {cakeSliced && (
+                  <>
+                    <div className="absolute bottom-8 left-1/2 w-0.5 h-32 bg-gray-400 transform -translate-x-1/2 animate-fade-in"></div>
+                    <div className="absolute bottom-8 left-1/2 w-24 h-0.5 bg-gray-400 transform -translate-x-1/2 rotate-30 origin-left animate-fade-in"></div>
+                    <div className="absolute bottom-8 left-1/2 w-24 h-0.5 bg-gray-400 transform -translate-x-1/2 -rotate-30 origin-left animate-fade-in"></div>
+                  </>
+                )}
               </div>
-            </div>
 
-            {showLetterButton && (
-              <div className="animate-fade-in">
+              {/* Elegant cake stand */}
+              <div className="w-96 h-6 bg-gradient-to-b from-gray-100 to-gray-200 rounded-full mx-auto shadow-2xl border-2 border-gray-300 mt-4 relative">
+                <div className="absolute top-1 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-60 rounded-full"></div>
+              </div>
+              <div className="w-88 h-3 bg-gradient-to-b from-gray-200 to-gray-300 rounded-full mx-auto shadow-inner mt-1"></div>
+            </div>
+          </div>
+
+          <div className="mt-16">
+            {!candlesBlown ? (
+              <div className="space-y-6">
+                <p className="text-xl font-dancing text-pink-600">
+                  Close your eyes, make a wish, and blow out the candles, my beautiful Lubna! 💨
+                </p>
                 <button
-                  onClick={handleLetterComplete}
+                  onClick={blowCandles}
+                  className="bg-gradient-to-r from-pink-400 to-rose-400 text-white py-4 px-8 rounded-full font-poppins font-medium text-lg hover:from-pink-500 hover:to-rose-500 transform hover:scale-105 transition-all duration-300 shadow-xl animate-pulse"
+                >
+                  🌬️ Blow Candles
+                </button>
+              </div>
+            ) : !cakeSliced ? (
+              <div className="space-y-6">
+                <div className="text-6xl animate-bounce">🎉</div>
+                <p className="text-2xl font-dancing text-pink-600">
+                  Happy Birthday My Beautiful Princess Lubna! 🎂
+                </p>
+                {showMessage && (
+                  <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-2xl mx-auto border border-pink-200 animate-fade-in">
+                    <div className="text-4xl mb-4">👑</div>
+                    <p className="text-lg font-poppins text-gray-700 leading-relaxed mb-6">
+                      I hope all your wishes come true, my love! This beautiful cake is made with all my love for you. Now let's cut it together and celebrate your special day! 💖
+                    </p>
+                    {showSliceButton && (
+                      <button
+                        onClick={sliceCake}
+                        className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 px-6 rounded-full font-poppins font-medium hover:from-pink-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-lg"
+                      >
+                        🔪 Cut the Beautiful Cake
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="text-6xl animate-bounce">🍰</div>
+                <p className="text-2xl font-dancing text-pink-600">
+                  Perfect! Let's enjoy this sweet moment together, Lubna! 
+                </p>
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-w-2xl mx-auto border border-pink-200 animate-fade-in">
+                  <div className="text-4xl mb-4">🌹</div>
+                  <p className="text-lg font-poppins text-gray-700 leading-relaxed">
+                    Every slice of this beautiful cake is filled with my endless love for you, Lubna. Even though we're miles apart, we're celebrating together in our hearts. You make every day sweeter, my princess! 🍰💕
+                  </p>
+                </div>
+                <button
+                  onClick={handleContinue}
                   className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-8 rounded-full font-poppins font-medium text-lg hover:from-pink-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-xl"
                 >
-                  Complete Our Journey
+                  Continue Our Magical Journey
                   <ArrowRight className="w-5 h-5 inline ml-2" />
                 </button>
               </div>
@@ -242,101 +259,8 @@ const FakeEnding: React.FC = () => {
           </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen p-4 bg-gradient-to-br from-pink-100 via-purple-50 to-cream-100 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(100)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-confetti text-2xl"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
-          >
-            {['🎉', '🎊', '💖', '✨', '🌟', '💕', '🎈', '🌹'][Math.floor(Math.random() * 8)]}
-          </div>
-        ))}
-      </div>
-
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(50)].map((_, i) => (
-          <Heart
-            key={i}
-            className="absolute text-pink-400 animate-float opacity-70"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-              fontSize: `${1 + Math.random() * 2}rem`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="max-w-4xl mx-auto py-8 relative z-10">
-        <div className="text-center animate-fade-in">
-          <div className="mb-8">
-            <div className="text-8xl mb-6 animate-pulse">💖</div>
-            <h1 className="text-6xl md:text-7xl font-dancing text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 mb-6">
-              Thank You For This Journey
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-pacifico text-pink-500 mb-8">
-              Every Click, Every Moment Was Magical
-            </h2>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-12 border border-pink-200 mb-8">
-            <div className="text-6xl mb-8">🌟</div>
-            <h3 className="text-3xl font-dancing mb-4">
-              This Website Will Be Stored Forever
-            </h3>
-            <p className="text-lg font-poppins leading-relaxed text-gray-700 mb-6">
-              Every word, every animation, every moment of love captured here will remain as a testament to our beautiful long-distance love story. Years from now, when we're old and gray, we can look back at this and remember how our love conquered every mile between us.
-            </p>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="text-green-600 font-poppins">
-                ✅ Your complete journey has been captured and preserved!
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-3xl p-8 shadow-2xl mb-8">
-            <div className="text-5xl mb-4">📊</div>
-            <h3 className="text-3xl font-dancing mb-4">
-              Your Journey Has Been Recorded
-            </h3>
-            <p className="text-lg font-poppins leading-relaxed">
-              Every interaction, every click, every moment you spent exploring this birthday surprise has been lovingly tracked and preserved. This way, we can remember exactly how you experienced our special day together! 💖
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="text-6xl mb-4 animate-pulse">🎉</div>
-            <h3 className="text-3xl font-dancing text-pink-600 mb-4">
-              Until We're Together...
-            </h3>
-            <p className="text-lg font-poppins text-gray-600 mb-8">
-              Every day brings us closer to forever! 💖
-            </p>
-            
-            <div className="bg-pink-50 border border-pink-200 rounded-2xl p-6">
-              <p className="text-pink-600 font-poppins">
-                🎂 Happy Birthday, My Beautiful Love! 🎂
-                <br />
-                This magical journey is complete, but our love story continues forever! 💕
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
-export default FakeEnding;
+export default VirtualCake;
