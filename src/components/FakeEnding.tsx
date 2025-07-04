@@ -1,4 +1,4 @@
-,import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, ArrowRight, Play } from 'lucide-react';
 import { sendComprehensiveReport } from '../utils/emailService';
 import { tracker } from '../utils/interactionTracker';
