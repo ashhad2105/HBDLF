@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, Lock } from 'lucide-react';
 import { tracker } from '../utils/interactionTracker';
+import { sendPasswordEntryNotification } from '../utils/emailService';
 
 interface PasswordGateProps {
   onSuccess: () => void;
@@ -19,7 +20,7 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess }) => {
     'One more try, my beautiful 💖',
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     tracker.trackInteraction('password_attempt', { 
@@ -29,6 +30,11 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess }) => {
 
     if (correctAnswers.includes(answer.toLowerCase().trim())) {
       tracker.trackInteraction('password_success');
+      
+      // Send immediate email notification that she entered the website
+      console.log('🚨 Password correct! Sending entry notification...');
+      await sendPasswordEntryNotification();
+      
       onSuccess();
     } else {
       setAttempts((prev) => prev + 1);
