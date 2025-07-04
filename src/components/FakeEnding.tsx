@@ -133,7 +133,7 @@ const FakeEnding: React.FC = () => {
             <div className="p-8">
               <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-6 relative border-4 border-gray-300">
                 <div className="w-full h-full">
-               <iframe 
+                  <iframe 
   width="100%" 
   height="100%" 
   src="https://drive.google.com/file/d/1EBLuW1lpxPE8j3GeZbF9DuJbkaPs0VyD/preview" 
@@ -143,11 +143,7 @@ const FakeEnding: React.FC = () => {
   allowfullscreen 
   class="rounded-2xl">
 </iframe>
-      <script src="script.js"></script>
-  </body>
-</html>
-
-                      </div>
+                </div>
               </div>
 
               <div className="bg-pink-50 p-6 rounded-2xl mb-6">
