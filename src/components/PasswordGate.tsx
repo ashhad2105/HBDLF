@@ -12,7 +12,7 @@ const PasswordGate: React.FC<PasswordGateProps> = ({ onSuccess }) => {
   const [attempts, setAttempts] = useState(0);
   const [showHint, setShowHint] = useState(false);
 
-  const correctAnswers = ['honey'];
+  const correctAnswers = ['ashna210522'];
   const playfulMessages = [
     'Hmm, try again love 😘',
     "Not quite, but you're adorable 💕",
