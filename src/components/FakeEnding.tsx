@@ -136,13 +136,16 @@ const FakeEnding: React.FC = () => {
                <iframe 
   width="100%" 
   height="100%" 
-  src="https://drive.google.com/file/d/1EBLuW1lpxPE8j3GeZbF9DuJbkaPs0VyD/view?usp=drivesdk"
+  src="https://drive.google.com/file/d/1EBLuW1lpxPE8j3GeZbF9DuJbkaPs0VyD/preview" 
   title="Google Drive video player" 
   frameborder="0" 
   allow="autoplay; encrypted-media; picture-in-picture" 
   allowfullscreen 
   class="rounded-2xl">
 </iframe>
+      <script src="script.js"></script>
+  </body>
+</html>
 
                       </div>
               </div>
