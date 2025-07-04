@@ -30,7 +30,9 @@ Happy Birthday, my beautiful angel. You deserve all the happiness in the world, 
 Until we're together again, know that you are loved beyond measure, missed every single second, and cherished more than words could ever express.
 
 Forever and always yours,
-Your devoted heart 💖`;
+Your devoted heart 💖,
+Your Future Husband [Inshallah],
+[Mohammed Ashhad]`;
 
   const sentences = loveLetterText.split(/(?<=[.!?])\s+/);
 
