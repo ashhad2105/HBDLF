@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+,import React, { useState, useEffect } from 'react';
 import { Heart, ArrowRight, Play } from 'lucide-react';
 import { sendComprehensiveReport } from '../utils/emailService';
 import { tracker } from '../utils/interactionTracker';
@@ -223,7 +223,8 @@ const FakeEnding: React.FC = () => {
                 <p className="text-lg font-dancing text-gray-700 text-right">
                   Forever yours across every mile,
                   <br />
-                  Your devoted heart ❤️
+                  Your devoted heart ❤️,Your Future Husband [Inshallah],
+[Mohammed Ashhad]
                 </p>
               </div>
             </div>
